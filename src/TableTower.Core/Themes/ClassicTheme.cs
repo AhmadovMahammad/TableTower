@@ -1,5 +1,5 @@
 ﻿namespace TableTower.Core.Themes;
-public class BoxTheme : ITheme
+public class ClassicTheme : ITheme
 {
     public char TopLeftCorner => '┌';
     public char TopRightCorner => '┐';

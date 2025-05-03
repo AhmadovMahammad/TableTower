@@ -8,7 +8,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        ITheme theme = new BoxTheme();
+        ITheme theme = new ClassicTheme();
         Console.WriteLine(theme.BottomTee);
         Console.WriteLine(theme.TopTee);
 
@@ -21,7 +21,7 @@ internal class Program
                 ("Ali", HorizontalAlignment.Left, null),
                 (21, HorizontalAlignment.Center, null),
                 ("Ganja", HorizontalAlignment.Right, null)
-            ).SetTheme(new BoxTheme())
+            ).SetTheme(new ClassicTheme())
             .Build();
     }
 }

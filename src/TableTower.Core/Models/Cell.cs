@@ -1,16 +1,18 @@
 ﻿using TableTower.Core.Enums;
+using TableTower.Core.Formatters;
 
 namespace TableTower.Core.Models;
 public class Cell : IEquatable<Cell>
 {
+    private readonly static ICellFormatter _cellFormatter = new DefaultCellFormatter();
+
     public object? Value { get; }
     public HorizontalAlignment HorizontalAlignment { get; }
     public ConsoleColor? Foreground { get; }
 
     public Cell(object? value, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, ConsoleColor? foreground = null)
     {
-        // todo: check value type, [ primitive and string ] types only
-        Value = value;
+        Value = _cellFormatter.Format(value);
         HorizontalAlignment = horizontalAlignment;
         Foreground = foreground;
     }

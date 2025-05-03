@@ -8,6 +8,10 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        ITheme theme = new BoxTheme();
+        Console.WriteLine(theme.BottomTee);
+        Console.WriteLine(theme.TopTee);
+
         Table table = new TableBuilder()
             .WithTitle("Users Details")
             .WithColumns("Name", "Age", "City")

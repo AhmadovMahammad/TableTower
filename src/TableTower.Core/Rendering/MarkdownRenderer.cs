@@ -1,8 +1,8 @@
 ﻿using TableTower.Core.Models;
 using TableTower.Core.Renderer.BuilderPattern;
-using TableTower.Core.Renderer.BuilderPattern.ConcreteBuilders;
+using TableTower.Core.Rendering.BuilderPattern.ConcreteBuilders;
 
-namespace TableTower.Core.Renderer;
+namespace TableTower.Core.Rendering;
 public class MarkdownRenderer : IRenderer
 {
     private readonly RenderDirector _director;

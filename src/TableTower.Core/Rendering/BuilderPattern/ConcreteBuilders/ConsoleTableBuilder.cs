@@ -1,9 +1,10 @@
 ﻿using System.Text;
 using TableTower.Core.Extensions;
 using TableTower.Core.Models;
+using TableTower.Core.Renderer.BuilderPattern;
 using TableTower.Core.Themes;
 
-namespace TableTower.Core.Renderer.BuilderPattern.ConcreteBuilders;
+namespace TableTower.Core.Rendering.BuilderPattern.ConcreteBuilders;
 public class ConsoleTableBuilder : IBuilder
 {
     private Table _table = null!;

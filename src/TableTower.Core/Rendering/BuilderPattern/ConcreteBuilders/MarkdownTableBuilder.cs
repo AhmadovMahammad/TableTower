@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using TableTower.Core.Models;
+using TableTower.Core.Renderer.BuilderPattern;
 
-namespace TableTower.Core.Renderer.BuilderPattern.ConcreteBuilders;
+namespace TableTower.Core.Rendering.BuilderPattern.ConcreteBuilders;
 public class MarkdownTableBuilder : IBuilder
 {
     private Table _table = null!;

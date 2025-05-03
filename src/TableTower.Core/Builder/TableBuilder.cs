@@ -1,4 +1,5 @@
-﻿using TableTower.Core.Enums;
+﻿using System.Reflection;
+using TableTower.Core.Enums;
 using TableTower.Core.Models;
 using TableTower.Core.Themes;
 
@@ -20,22 +21,60 @@ public sealed class TableBuilder
         return this;
     }
 
+    public TableBuilder WithData<T>(IEnumerable<T> data, bool usePredefinedColumns = false)
+    {
+        if (data == null)
+        {
+            return this;
+        }
+
+        Type dataType = typeof(T);
+        PropertyInfo[] properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        if (!usePredefinedColumns)
+        {
+            _columns.Clear();
+            foreach (var prop in properties)
+            {
+                string columnName = prop.Name;
+                AddColumn(columnName, HorizontalAlignment.Left);
+            }
+        }
+
+        foreach (object? item in data)
+        {
+            object?[] values = new object?[properties.Length];
+            for (int i = 0; i < properties.Length; i++)
+            {
+                values[i] = properties[i].GetValue(item);
+            }
+
+            AddRow(values);
+        }
+
+        return this;
+    }
+
     public TableBuilder WithColumns(params string[] columns)
     {
         foreach (string column in columns)
         {
-            _columns.Add(new Column(column, HorizontalAlignment.Left));
+            AddColumn(column, HorizontalAlignment.Left);
         }
 
-        _columnCount += columns.Length;
         return this;
     }
 
     public TableBuilder WithColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left, int? width = null)
     {
+        AddColumn(header, alignment, width);
+        return this;
+    }
+
+    private void AddColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left, int? width = null)
+    {
         _columns.Add(new Column(header, alignment, width));
         _columnCount++;
-        return this;
     }
 
     public TableBuilder AddRow(params object?[] values)

@@ -9,6 +9,7 @@ public class Cell : IEquatable<Cell>
 
     public Cell(object? value, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, ConsoleColor? foreground = null)
     {
+        // todo: check value type, [ primitive and string ] types only
         Value = value;
         HorizontalAlignment = horizontalAlignment;
         Foreground = foreground;

@@ -1,16 +1,20 @@
-﻿namespace TableTower.Core.Models;
+﻿using TableTower.Core.Themes;
+
+namespace TableTower.Core.Models;
 public class Table : IEquatable<Table>
 {
     public string? Title { get; }
     public IReadOnlyList<Column> Columns { get; }
     public IReadOnlyList<Row> Rows { get; }
+    public ITheme? Theme { get; }
     public bool ShowRowLines { get; }
 
-    public Table(string? title, IReadOnlyList<Column> columns, IReadOnlyList<Row> rows, bool showRowLines)
+    public Table(string? title, IReadOnlyList<Column> columns, IReadOnlyList<Row> rows, ITheme? theme, bool showRowLines)
     {
         Title = title;
         Columns = columns;
         Rows = rows;
+        Theme = theme;
         ShowRowLines = showRowLines;
     }
 
@@ -20,6 +24,7 @@ public class Table : IEquatable<Table>
         return Title == other.Title &&
                Columns.SequenceEqual(other.Columns) &&
                Rows.SequenceEqual(other.Rows) &&
+               Theme == other.Theme &&
                ShowRowLines == other.ShowRowLines;
     }
 
@@ -40,6 +45,7 @@ public class Table : IEquatable<Table>
         }
 
         hashCode.Add(Title);
+        hashCode.Add(Theme);
         hashCode.Add(ShowRowLines);
 
         return hashCode.ToHashCode();

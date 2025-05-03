@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
 using TableTower.Core.Builder;
-using TableTower.Core.Enums;
 using TableTower.Core.Rendering;
 using TableTower.Core.Themes;
 using TableTower.Data;

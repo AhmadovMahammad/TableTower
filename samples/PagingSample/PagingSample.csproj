@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TableTower.Core\TableTower.Core.csproj" />
+    <ProjectReference Include="..\..\src\TableTower.Data\TableTower.Data.csproj" />
+  </ItemGroup>
+
 </Project>

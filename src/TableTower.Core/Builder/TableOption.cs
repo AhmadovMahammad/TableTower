@@ -1,6 +1,4 @@
-﻿using TableTower.Core.Themes;
-
-namespace TableTower.Core.Builder;
+﻿namespace TableTower.Core.Builder;
 public sealed class TableOptions
 {
     public string? Title { get; set; }

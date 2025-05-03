@@ -1,5 +1,5 @@
 ﻿namespace TableTower.Core.Themes;
-public abstract class MinimalTheme : ITheme
+public class MinimalTheme : ITheme
 {
     public char TopLeftCorner => ' ';
     public char TopRightCorner => ' ';

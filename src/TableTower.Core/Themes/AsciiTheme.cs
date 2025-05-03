@@ -1,5 +1,5 @@
 ﻿namespace TableTower.Core.Themes;
-public abstract class AsciiTheme : ITheme
+public class AsciiTheme : ITheme
 {
     public char TopLeftCorner => '+';
     public char TopRightCorner => '+';

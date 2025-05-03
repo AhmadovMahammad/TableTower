@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TableTower.Core.Themes;
-public abstract class NoBorderTheme : ITheme
+﻿namespace TableTower.Core.Themes;
+public  class NoBorderTheme : ITheme
 {
     public char TopLeftCorner => ' ';
     public char TopRightCorner => ' ';

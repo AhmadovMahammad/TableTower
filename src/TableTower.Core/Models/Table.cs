@@ -6,10 +6,10 @@ public class Table : IEquatable<Table>
     public string? Title { get; }
     public IReadOnlyList<Column> Columns { get; }
     public IReadOnlyList<Row> Rows { get; }
-    public ITheme? Theme { get; }
+    public ITheme Theme { get; }
     public bool ShowRowLines { get; }
 
-    public Table(string? title, IReadOnlyList<Column> columns, IReadOnlyList<Row> rows, ITheme? theme, bool showRowLines)
+    public Table(string? title, IReadOnlyList<Column> columns, IReadOnlyList<Row> rows, ITheme theme, bool showRowLines)
     {
         Title = title;
         Columns = columns;

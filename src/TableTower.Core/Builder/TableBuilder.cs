@@ -78,6 +78,7 @@ public sealed class TableBuilder
 
     public Table Build()
     {
+        _theme ??= new RoundedTheme();
         return new Table(_title, _columns, _rows, _theme, _showRowLines);
     }
 }

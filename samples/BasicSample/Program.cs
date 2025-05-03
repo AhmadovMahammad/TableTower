@@ -1,6 +1,7 @@
 ﻿using TableTower.Core.Builder;
 using TableTower.Core.Enums;
 using TableTower.Core.Models;
+using TableTower.Core.Renderer;
 using TableTower.Core.Themes;
 
 namespace BasicSample;
@@ -8,10 +9,6 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        ITheme theme = new ClassicTheme();
-        Console.WriteLine(theme.BottomTee);
-        Console.WriteLine(theme.TopTee);
-
         Table table = new TableBuilder()
             .WithTitle("Users Details")
             .WithColumns("Name", "Age", "City")
@@ -23,5 +20,7 @@ internal class Program
                 ("Ganja", HorizontalAlignment.Right, null)
             ).SetTheme(new ClassicTheme())
             .Build();
+
+        new ConsoleRenderer().Print(table);
     }
 }

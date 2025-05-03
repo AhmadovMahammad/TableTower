@@ -7,7 +7,7 @@ public static class AlignmentExtension
     {
         if (text.Length > width)
         {
-            return text.AsSpan(0, width - 3).ToString() + "...";
+            return string.Concat(text.AsSpan(0, width - 3), "...");
         }
 
         int inflate = width - text.Length;

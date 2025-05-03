@@ -27,11 +27,11 @@ public class ConsoleTableBuilder : IBuilder
         for (int i = 0; i < columns.Count; i++)
         {
             int currentMax = columns[i].Width;
+            List<Cell> nthCells = rows.SelectMany(row => row.Cells.Skip(i).Take(1)).ToList();
 
-            Row row = rows[i];
-            for (int j = 0; j < row.Cells.Count; j++)
+            for (int j = 0; j < nthCells.Count; j++)
             {
-                Cell currentCell = row.Cells[j];
+                Cell currentCell = nthCells[j];
                 if (currentCell.Width > currentMax)
                 {
                     currentMax = currentCell.Width;

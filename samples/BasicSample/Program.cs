@@ -22,7 +22,7 @@ internal class Program
                         !t.IsInterface &&
                         typeof(ITheme).IsAssignableFrom(t));
 
-        foreach (Type themeType in themes)
+        foreach (Type themeType in themes.Reverse())
         {
             object? instance = Activator.CreateInstance(themeType);
             if (instance != null)
@@ -36,13 +36,13 @@ internal class Program
     {
         var builder = new TableBuilder()
             .WithTitle(title)
-            .WithColumn("ID", HorizontalAlignment.Left)
-            .WithColumn("Name", HorizontalAlignment.Left)
-            .WithColumn("Occupation", HorizontalAlignment.Left)
-            .WithColumn("Country", HorizontalAlignment.Left)
-            .WithColumn("Description", HorizontalAlignment.Left)
+            .WithColumns("ID")
+            .WithColumn("Name", HorizontalAlignment.Left, 20)
+            .WithColumn("Occupation", HorizontalAlignment.Left, 20)
+            .WithColumn("Country", HorizontalAlignment.Center, 20)
+            .WithColumn("Description", HorizontalAlignment.Right, 30)
             .SetTheme(theme)
-            .WrapData(wrapData);
+            .WrapData(true);
 
         builder.AddRow(1, "Mahammad Ahmadov", "Software Developer", "Azerbaijan", "Builds clean backend systems.");
         builder.AddRow(2, "Lale Hasanli", "UX Designer", "Azerbaijan", "Designs intuitive interfaces.");
@@ -52,6 +52,7 @@ internal class Program
         builder.AddRow(6, "Narmin Karimova", "AI Researcher", "Azerbaijan", "Improves deep learning models.");
         builder.AddRow(7, "Kamran Safarov", "Security Analyst", "Azerbaijan", "Secures systems and data.");
         builder.AddRow(8, "Sevinc Ismayilova", "Frontend Engineer", "Azerbaijan", "Builds responsive UIs.");
+        builder.AddRow(9, "Sahnise Shirinli", "Sales Specialist", "Azerbaijan", "Manages ticket sales.");
 
         var table = builder.Build();
         new ConsoleRenderer().Print(table);

@@ -7,11 +7,11 @@ public class Column : IEquatable<Column>
     public HorizontalAlignment HorizontalAlignment { get; }
     public int Width { get; }
 
-    public Column(string header, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left)
+    public Column(string header, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, int? width = null)
     {
         Header = header;
         HorizontalAlignment = horizontalAlignment;
-        Width = header.Length;
+        Width = width ?? header.Length;
     }
 
     public bool Equals(Column? other)

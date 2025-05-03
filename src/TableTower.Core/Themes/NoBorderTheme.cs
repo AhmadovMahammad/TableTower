@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TableTower.Core.Themes;
-public class NoBorderTheme : ITheme
+public abstract class NoBorderTheme : ITheme
 {
     public char TopLeftCorner => ' ';
     public char TopRightCorner => ' ';
     public char BottomLeftCorner => ' ';
     public char BottomRightCorner => ' ';
-    
+
     public char TopTee => ' ';
     public char BottomTee => ' ';
     public char LeftTee => ' ';

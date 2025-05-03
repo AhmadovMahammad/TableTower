@@ -31,34 +31,43 @@ public sealed class TableBuilder
         return this;
     }
 
-    public TableBuilder WithColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left)
+    public TableBuilder WithColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left, int? width = null)
     {
-        _columns.Add(new Column(header, alignment));
+        _columns.Add(new Column(header, alignment, width));
         _columnCount++;
         return this;
     }
 
-    public TableBuilder AddRow(params object[] values)
+    public TableBuilder AddRow(params object?[] values)
     {
         var cellFormats = values.Select(val =>
         {
-            return ValueTuple.Create<object?, HorizontalAlignment, ConsoleColor?>(val, HorizontalAlignment.Left, ConsoleColor.White);
+            return ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(val, null, ConsoleColor.White);
         }).ToArray();
 
         return AddFormattedRow(cellFormats);
     }
 
-    public TableBuilder AddFormattedRow(params (object? Value, HorizontalAlignment Alignment, ConsoleColor? Color)[] cellFormats)
+    public TableBuilder AddFormattedRow(params (object? Value, HorizontalAlignment? HorizontalAlignment, ConsoleColor? Color)[] cellFormats)
     {
-        if (cellFormats.Length > _columnCount)
+        if (cellFormats.Length != _columnCount)
         {
             throw new ArgumentException("Parameter counts do not match with columns count.");
         }
 
         List<Cell> cells = [];
-        foreach (var cellFormat in cellFormats)
+        List<Column> columns = _columns;
+
+        for (int i = 0; i < _columnCount; i++)
         {
-            cells.Add(new Cell(cellFormat.Value, cellFormat.Alignment, cellFormat.Color));
+            Column currentColumn = columns[i];
+
+            var cellFormat = cellFormats[i];
+            cellFormat.HorizontalAlignment ??= currentColumn.HorizontalAlignment;
+
+            cells.Add(new Cell(cellFormat.Value,
+                               cellFormat.HorizontalAlignment ?? HorizontalAlignment.Left,
+                               cellFormat.Color));
         }
 
         _rows.Add(new Row(cells, _rowIndex++));

@@ -148,6 +148,22 @@ public class ConsoleTableBuilder : IBuilder
         }
 
         _stringBuilder.Append(_theme.BottomRightCorner);
+
+        if (_table.EnableDataCount)
+        {
+            _stringBuilder.AppendLine();
+
+            var totalRows = _table.Rows.Count;
+            var pageInfo = $"Total: {totalRows} row{(totalRows == 1 ? "" : "s")}";
+
+            // Calculate the total width of the table footer line:
+            // - Sum of all column widths
+            // - (_table.Columns.Count - 1) vertical separators between columns
+            // - 2 characters for the left and right borders of the table
+            int totalWidth = _columnWidths.Sum() + _table.Columns.Count - 1 + 2;
+
+            _stringBuilder.AppendLine(pageInfo.PadLeft(totalWidth));
+        }
     }
 
     public string GetResult() => _stringBuilder.ToString();

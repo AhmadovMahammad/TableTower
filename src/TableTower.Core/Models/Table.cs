@@ -1,4 +1,5 @@
-﻿using TableTower.Core.Themes;
+﻿using TableTower.Core.Builder;
+using TableTower.Core.Themes;
 
 namespace TableTower.Core.Models;
 public class Table : IEquatable<Table>
@@ -9,20 +10,20 @@ public class Table : IEquatable<Table>
     public ITheme Theme { get; }
     public bool ShowRowLines { get; }
     public bool WrapData { get; }
+    public bool EnableDataCount { get; }
 
-    public Table(string? title,
-                 IReadOnlyList<Column> columns,
+    public Table(IReadOnlyList<Column> columns,
                  IReadOnlyList<Row> rows,
                  ITheme theme,
-                 bool showRowLines,
-                 bool wrapData)
+                 TableOptions options)
     {
-        Title = title;
         Columns = columns;
         Rows = rows;
         Theme = theme;
-        ShowRowLines = showRowLines;
-        WrapData = wrapData;
+        Title = options.Title;
+        ShowRowLines = options.ShowRowLines;
+        WrapData = options.WrapData;
+        EnableDataCount = options.EnableDataCount;
     }
 
     public bool Equals(Table? other)

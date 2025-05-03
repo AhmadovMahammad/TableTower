@@ -6,19 +6,18 @@ using TableTower.Core.Themes;
 namespace TableTower.Core.Builder;
 public sealed class TableBuilder
 {
-    private string? _title;
     private readonly List<Column> _columns = [];
     private readonly List<Row> _rows = [];
-    private ITheme? _theme;
-    private bool _showRowLines = true;
-    private bool _wrapData = true;
     private int _rowIndex;
     private int _columnCount;
+    private ITheme? _theme;
 
-    public TableBuilder WithTitle(string title)
+    private readonly TableOptions _tableOptions;
+
+    public TableBuilder(Action<TableOptions>? configure = null)
     {
-        _title = title;
-        return this;
+        _tableOptions = new TableOptions();
+        configure?.Invoke(_tableOptions);
     }
 
     public TableBuilder WithData<T>(IEnumerable<T> data, bool usePredefinedColumns = false)
@@ -113,27 +112,15 @@ public sealed class TableBuilder
         return this;
     }
 
-    public TableBuilder SetTheme(ITheme theme)
+    public TableBuilder WithTheme(ITheme theme)
     {
         _theme = theme;
-        return this;
-    }
-
-    public TableBuilder ShowRowLines(bool show)
-    {
-        _showRowLines = show;
-        return this;
-    }
-
-    public TableBuilder WrapData(bool wrapData)
-    {
-        _wrapData = wrapData;
         return this;
     }
 
     public Table Build()
     {
         _theme ??= new RoundedTheme();
-        return new Table(_title, _columns, _rows, _theme, _showRowLines, _wrapData);
+        return new Table(_columns, _rows, _theme, _tableOptions);
     }
 }

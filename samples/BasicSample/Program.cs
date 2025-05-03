@@ -27,13 +27,15 @@ internal class Program
             object? instance = Activator.CreateInstance(themeType);
             if (instance != null)
             {
-                RunExample(themeType.Name, (ITheme)instance, false);
+                RunExample($"[ {themeType.Name} ] Team Members", (ITheme)instance, false);
             }
         }
     }
 
     private static void RunExample(string title, ITheme theme, bool wrapData)
     {
+        // Option #1 - add data manually
+
         //var builder = new TableBuilder()
         //    .WithTitle(title)
         //    .WithColumns("ID", "Name", "Occupation", "Country")
@@ -46,13 +48,12 @@ internal class Program
         //    builder.AddRow(user.ID, user.Name, user.Occupation, user.Country, user.Description);
         //}
 
-        var builder = new TableBuilder()
-            .WithTitle(title)
-            .WithColumns("ID", "Name", "Occupation", "Country")
-            .WithColumn("Description", HorizontalAlignment.Right, 40)
-            .WithData(InMemoryDatabase.Users, true) // you can change it false and remove adding columns manually
-            .SetTheme(theme)
-            .WrapData(wrapData);
+
+        // Option #2 - add data dynamically
+
+        var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })
+            .WithData(InMemoryDatabase.Users)
+            .WithTheme(theme);
 
         var table = builder.Build();
         new ConsoleRenderer().Print(table);

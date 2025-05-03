@@ -1,4 +1,6 @@
-﻿using TableTower.Core.Builder;
+﻿using System.Reflection;
+using System.Text;
+using TableTower.Core.Builder;
 using TableTower.Core.Enums;
 using TableTower.Core.Models;
 using TableTower.Core.Renderer;
@@ -9,18 +11,51 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        Table table = new TableBuilder()
-            .WithTitle("Users Details")
-            .WithColumns("Name", "Age", "City")
-            .AddRow("Mahammad", 21, "Sumgait")
-            .AddFormattedRow
-            (
-                ("Ali", HorizontalAlignment.Left, null),
-                (21, HorizontalAlignment.Center, null),
-                ("Ganja", HorizontalAlignment.Right, null)
-            ).SetTheme(new ClassicTheme())
-            .Build();
+        Console.OutputEncoding = Encoding.UTF8;
 
+        string dir = AppDomain.CurrentDomain.BaseDirectory;
+        Assembly assembly = Assembly.LoadFrom(Path.Combine(dir, "TableTower.Core.dll"));
+
+        var themes = assembly
+            .GetExportedTypes()
+            .Where(t => !t.IsAbstract &&
+                        !t.IsInterface &&
+                        typeof(ITheme).IsAssignableFrom(t));
+
+        foreach (Type themeType in themes)
+        {
+            object? instance = Activator.CreateInstance(themeType);
+            if (instance != null)
+            {
+                RunExample(themeType.Name, (ITheme)instance, true);
+            }
+        }
+    }
+
+    private static void RunExample(string title, ITheme theme, bool wrapData)
+    {
+        var builder = new TableBuilder()
+            .WithTitle(title)
+            .WithColumn("ID", HorizontalAlignment.Left)
+            .WithColumn("Name", HorizontalAlignment.Left)
+            .WithColumn("Occupation", HorizontalAlignment.Left)
+            .WithColumn("Country", HorizontalAlignment.Left)
+            .WithColumn("Description", HorizontalAlignment.Left)
+            .SetTheme(theme)
+            .WrapData(wrapData);
+
+        builder.AddRow(1, "Mahammad Ahmadov", "Software Developer", "Azerbaijan", "Builds clean backend systems.");
+        builder.AddRow(2, "Lale Hasanli", "UX Designer", "Azerbaijan", "Designs intuitive interfaces.");
+        builder.AddRow(3, "Rashad Mammadov", "Product Manager", "Azerbaijan", "Leads user-focused products.");
+        builder.AddRow(4, "Aygun Aliyeva", "Data Scientist", "Azerbaijan", "Finds insights in data.");
+        builder.AddRow(5, "Togrul Huseynov", "DevOps Engineer", "Azerbaijan", "Builds automated pipelines.");
+        builder.AddRow(6, "Narmin Karimova", "AI Researcher", "Azerbaijan", "Improves deep learning models.");
+        builder.AddRow(7, "Kamran Safarov", "Security Analyst", "Azerbaijan", "Secures systems and data.");
+        builder.AddRow(8, "Sevinc Ismayilova", "Frontend Engineer", "Azerbaijan", "Builds responsive UIs.");
+
+        var table = builder.Build();
         new ConsoleRenderer().Print(table);
+
+        Console.WriteLine("\n\n");
     }
 }

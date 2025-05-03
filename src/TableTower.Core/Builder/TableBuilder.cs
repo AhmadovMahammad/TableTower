@@ -10,6 +10,7 @@ public sealed class TableBuilder
     private readonly List<Row> _rows = [];
     private ITheme? _theme;
     private bool _showRowLines = true;
+    private bool _wrapData = true;
     private int _rowIndex;
     private int _columnCount;
 
@@ -23,16 +24,16 @@ public sealed class TableBuilder
     {
         foreach (string column in columns)
         {
-            _columns.Add(new Column(column, HorizontalAlignment.Left, null, false));
+            _columns.Add(new Column(column, HorizontalAlignment.Left));
         }
 
         _columnCount += columns.Length;
         return this;
     }
 
-    public TableBuilder WithColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left, int? width = null, bool wrap = false)
+    public TableBuilder WithColumn(string header, HorizontalAlignment alignment = HorizontalAlignment.Left)
     {
-        _columns.Add(new Column(header, alignment, width, wrap));
+        _columns.Add(new Column(header, alignment));
         _columnCount++;
         return this;
     }
@@ -76,9 +77,15 @@ public sealed class TableBuilder
         return this;
     }
 
+    public TableBuilder WrapData(bool wrapData)
+    {
+        _wrapData = wrapData;
+        return this;
+    }
+
     public Table Build()
     {
         _theme ??= new RoundedTheme();
-        return new Table(_title, _columns, _rows, _theme, _showRowLines);
+        return new Table(_title, _columns, _rows, _theme, _showRowLines, _wrapData);
     }
 }

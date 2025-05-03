@@ -1,11 +1,9 @@
 ﻿using TableTower.Core.Models;
-using TableTower.Core.Renderer.BuilderPattern.ConcreteBuilders;
 
 namespace TableTower.Core.Renderer.BuilderPattern;
-public class RenderDirector
+public class RenderDirector(IBuilder builder)
 {
-    private readonly IBuilder _builder;
-    public RenderDirector(IBuilder builder) => _builder = builder;
+    private readonly IBuilder _builder = builder;
 
     public void BuildSimpleTable(Table table)
     {

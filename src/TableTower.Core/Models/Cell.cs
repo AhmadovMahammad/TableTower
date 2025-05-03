@@ -6,15 +6,17 @@ public class Cell : IEquatable<Cell>
 {
     private readonly static ICellFormatter _cellFormatter = new DefaultCellFormatter();
 
-    public object? Value { get; }
+    public string Value { get; }
     public HorizontalAlignment HorizontalAlignment { get; }
     public ConsoleColor? Foreground { get; }
+    public int Width { get; }
 
     public Cell(object? value, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left, ConsoleColor? foreground = null)
     {
         Value = _cellFormatter.Format(value);
         HorizontalAlignment = horizontalAlignment;
         Foreground = foreground;
+        Width = Value.Length;
     }
 
     public bool Equals(Cell? other)

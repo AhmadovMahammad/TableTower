@@ -1,16 +1,49 @@
 ﻿using System.Text;
+using TableTower.Core.Extensions;
 using TableTower.Core.Models;
+using TableTower.Core.Themes;
 
 namespace TableTower.Core.Renderer.BuilderPattern.ConcreteBuilders;
 public class ConsoleTableBuilder : IBuilder
 {
     private Table _table = null!;
+    private ITheme _theme = null!;
     private readonly StringBuilder _stringBuilder = new();
+    private List<int> _columnWidths = [];
 
     public void SetTable(Table table)
     {
         _table = table;
+        _theme = table.Theme;
+        _columnWidths = table.WrapData
+            ? _table.Columns.Select(column => column.Width + 4).ToList()
+            : CalculateColumnWidths(table.Columns, table.Rows);
     }
+
+    private List<int> CalculateColumnWidths(IReadOnlyList<Column> columns, IReadOnlyList<Row> rows)
+    {
+        var widths = new List<int>(columns.Count);
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            int currentMax = columns[i].Width;
+
+            Row row = rows[i];
+            for (int j = 0; j < row.Cells.Count; j++)
+            {
+                Cell currentCell = row.Cells[j];
+                if (currentCell.Width > currentMax)
+                {
+                    currentMax = currentCell.Width;
+                }
+            }
+
+            widths.Add(currentMax + 4);
+        }
+
+        return widths;
+    }
+
 
     public void BuildTitle()
     {
@@ -22,20 +55,98 @@ public class ConsoleTableBuilder : IBuilder
 
     public void BuildHeader()
     {
-        // mock
-        _stringBuilder.AppendLine("HEADER");
+        IReadOnlyList<Column> columns = _table.Columns;
+
+        _stringBuilder.Append(_theme.TopLeftCorner);
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
+
+            if (i != columns.Count - 1)
+            {
+                _stringBuilder.Append(_theme.TopTee);
+            }
+        }
+
+        _stringBuilder.Append(_theme.TopRightCorner).AppendLine();
+
+        _stringBuilder.Append(_theme.VerticalLine);
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            string header = columns[i].Header.ApplyAlignment(_columnWidths[i], columns[i].HorizontalAlignment);
+            _stringBuilder.Append(header);
+
+            if (i != columns.Count - 1)
+            {
+                _stringBuilder.Append(_theme.VerticalLine);
+            }
+        }
+
+        _stringBuilder.Append(_theme.VerticalLine).AppendLine();
+
+        _stringBuilder.Append(_theme.LeftTee);
+
+        for (int i = 0; i < columns.Count; i++)
+        {
+            _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
+
+            if (i != columns.Count - 1)
+            {
+                _stringBuilder.Append(_theme.Intersection);
+            }
+        }
+
+        _stringBuilder.Append(_theme.RightTee);
     }
 
     public void BuildBody()
     {
-        // mock
-        _stringBuilder.AppendLine("BODY");
+        int rowCount = _table.Rows.Count;
+
+        for (int i = 0; i < rowCount; i++)
+        {
+            _stringBuilder.AppendLine();
+
+            _stringBuilder.Append(_theme.VerticalLine);
+
+            Row currentRow = _table.Rows[i];
+            int cellsCount = currentRow.Cells.Count;
+
+            for (int j = 0; j < cellsCount; j++)
+            {
+                Cell cell = currentRow.Cells[j];
+                string formatted = cell.Value.ApplyAlignment(_columnWidths[j], cell.HorizontalAlignment);
+                _stringBuilder.Append(formatted);
+
+                if (j != cellsCount - 1)
+                {
+                    _stringBuilder.Append(_theme.VerticalLine);
+                }
+            }
+
+            _stringBuilder.Append(_theme.VerticalLine);
+        }
     }
 
     public void BuildFooter()
     {
-        // mock
-        _stringBuilder.AppendLine("FOOTER");
+        _stringBuilder.AppendLine();
+
+        _stringBuilder.Append(_theme.BottomLeftCorner);
+
+        for (int i = 0; i < _table.Columns.Count; i++)
+        {
+            _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
+
+            if (i != _table.Columns.Count - 1)
+            {
+                _stringBuilder.Append(_theme.BottomTee);
+            }
+        }
+
+        _stringBuilder.Append(_theme.BottomRightCorner);
     }
 
     public string GetResult() => _stringBuilder.ToString();

@@ -11,12 +11,12 @@ public class RoundedTheme : ITheme
     public char TopRightCorner => '╮';
     public char BottomLeftCorner => '╰';
     public char BottomRightCorner => '╯';
-    
+
     public char TopTee => '┬';
     public char BottomTee => '┴';
     public char LeftTee => '├';
     public char RightTee => '┤';
-    
+
     public char HorizontalLine => '─';
     public char VerticalLine => '│';
     public char Intersection => '┼';

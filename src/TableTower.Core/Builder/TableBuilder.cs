@@ -6,13 +6,15 @@ using TableTower.Core.Themes;
 namespace TableTower.Core.Builder;
 public sealed class TableBuilder
 {
-    private readonly List<Column> _columns = [];
-    private readonly List<Row> _rows = [];
+    private readonly List<Column> _columns = new(20);
+    private readonly List<Row> _rows = new(100);
+
     private int _rowIndex;
     private int _columnCount;
     private ITheme? _theme;
-
     private readonly TableOptions _tableOptions;
+
+    private static readonly Dictionary<Type, PropertyInfo[]> _propertyCache = new Dictionary<Type, PropertyInfo[]>(10);
 
     public TableBuilder(Action<TableOptions>? configure = null)
     {
@@ -28,7 +30,18 @@ public sealed class TableBuilder
         }
 
         Type dataType = typeof(T);
-        PropertyInfo[] properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        PropertyInfo[] properties;
+        lock (_propertyCache)
+        {
+            if (!_propertyCache.TryGetValue(dataType, out properties!))
+            {
+                properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                _propertyCache[dataType] = properties;
+            }
+        }
+
+        var dataList = data as List<T> ?? data.ToList();
 
         if (!usePredefinedColumns)
         {
@@ -40,9 +53,10 @@ public sealed class TableBuilder
             }
         }
 
-        foreach (object? item in data)
+        object?[] values = new object?[properties.Length];
+
+        foreach (T item in dataList)
         {
-            object?[] values = new object?[properties.Length];
             for (int i = 0; i < properties.Length; i++)
             {
                 values[i] = properties[i].GetValue(item);
@@ -56,6 +70,11 @@ public sealed class TableBuilder
 
     public TableBuilder WithColumns(params string[] columns)
     {
+        if (_columns.Capacity < columns.Length)
+        {
+            _columns.Capacity = columns.Length;
+        }
+
         foreach (string column in columns)
         {
             AddColumn(column, HorizontalAlignment.Left);
@@ -78,10 +97,12 @@ public sealed class TableBuilder
 
     public TableBuilder AddRow(params object?[] values)
     {
-        var cellFormats = values.Select(val =>
+        var cellFormats = new ValueTuple<object?, HorizontalAlignment?, ConsoleColor?>[values.Length];
+
+        for (int i = 0; i < values.Length; i++)
         {
-            return ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(val, null, ConsoleColor.White);
-        }).ToArray();
+            cellFormats[i] = ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(values[i], null, ConsoleColor.White);
+        }
 
         return AddFormattedRow(cellFormats);
     }
@@ -93,13 +114,11 @@ public sealed class TableBuilder
             throw new ArgumentException("Parameter counts do not match with columns count.");
         }
 
-        List<Cell> cells = [];
-        List<Column> columns = _columns;
+        List<Cell> cells = new(_columnCount);
 
         for (int i = 0; i < _columnCount; i++)
         {
-            Column currentColumn = columns[i];
-
+            Column currentColumn = _columns[i];
             var cellFormat = cellFormats[i];
             cellFormat.HorizontalAlignment ??= currentColumn.HorizontalAlignment;
 

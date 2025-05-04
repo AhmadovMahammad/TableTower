@@ -1,9 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
+		<Version>1.0.0</Version>
+		<Authors>Mahammad Ahmadov</Authors>
+		<Company>TableTower</Company>
+		<PackageId>TableTower.Core</PackageId>
+		<Description>Simple table rendering library for console apps in .NET</Description>
+		<PackageTags>table console rendering unicode</PackageTags>
+
+		<RepositoryUrl>https://github.com/AhmadovMahammad/TableTower</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/AhmadovMahammad/TableTower</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>table.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="table.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
 </Project>

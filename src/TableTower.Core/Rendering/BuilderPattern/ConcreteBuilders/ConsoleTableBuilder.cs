@@ -9,7 +9,9 @@ public class ConsoleTableBuilder : IBuilder
 {
     private Table _table = null!;
     private ITheme _theme = null!;
-    private readonly StringBuilder _stringBuilder = new();
+
+    // Pre-allocate StringBuilder with a reasonable capacity to avoid resizing
+    private readonly StringBuilder _stringBuilder = new(4096);
     private List<int> _columnWidths = [];
 
     public void SetTable(Table table)
@@ -28,14 +30,16 @@ public class ConsoleTableBuilder : IBuilder
         for (int i = 0; i < columns.Count; i++)
         {
             int currentMax = columns[i].Width;
-            List<Cell> nthCells = rows.SelectMany(row => row.Cells.Skip(i).Take(1)).ToList();
 
-            for (int j = 0; j < nthCells.Count; j++)
+            for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
             {
-                Cell currentCell = nthCells[j];
-                if (currentCell.Width > currentMax)
+                if (i < rows[rowIndex].Cells.Count)
                 {
-                    currentMax = currentCell.Width;
+                    var cellWidth = rows[rowIndex].Cells[i].Width;
+                    if (cellWidth > currentMax)
+                    {
+                        currentMax = cellWidth;
+                    }
                 }
             }
 
@@ -48,6 +52,8 @@ public class ConsoleTableBuilder : IBuilder
 
     public void BuildTitle()
     {
+        _stringBuilder.Clear();
+
         if (!string.IsNullOrWhiteSpace(_table.Title))
         {
             _stringBuilder.AppendLine(_table.Title.ToUpper());
@@ -60,40 +66,41 @@ public class ConsoleTableBuilder : IBuilder
 
         _stringBuilder.Append(_theme.TopLeftCorner);
 
-        for (int i = 0; i < columns.Count; i++)
+        int columnsCount = columns.Count;
+        int lastColumnIndex = columnsCount - 1;
+
+        for (int i = 0; i < columnsCount; i++)
         {
             _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
 
-            if (i != columns.Count - 1)
+            if (i != lastColumnIndex)
             {
                 _stringBuilder.Append(_theme.TopTee);
             }
         }
 
         _stringBuilder.Append(_theme.TopRightCorner).AppendLine();
-
         _stringBuilder.Append(_theme.VerticalLine);
 
-        for (int i = 0; i < columns.Count; i++)
+        for (int i = 0; i < columnsCount; i++)
         {
             string header = columns[i].Header.ApplyAlignment(_columnWidths[i], columns[i].HorizontalAlignment);
             _stringBuilder.Append(header);
 
-            if (i != columns.Count - 1)
+            if (i != lastColumnIndex)
             {
                 _stringBuilder.Append(_theme.VerticalLine);
             }
         }
 
         _stringBuilder.Append(_theme.VerticalLine).AppendLine();
-
         _stringBuilder.Append(_theme.LeftTee);
 
-        for (int i = 0; i < columns.Count; i++)
+        for (int i = 0; i < columnsCount; i++)
         {
             _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
 
-            if (i != columns.Count - 1)
+            if (i != lastColumnIndex)
             {
                 _stringBuilder.Append(_theme.Intersection);
             }
@@ -109,11 +116,11 @@ public class ConsoleTableBuilder : IBuilder
         for (int i = 0; i < rowCount; i++)
         {
             _stringBuilder.AppendLine();
-
             _stringBuilder.Append(_theme.VerticalLine);
 
             Row currentRow = _table.Rows[i];
             int cellsCount = currentRow.Cells.Count;
+            int lastCellIndex = cellsCount - 1;
 
             for (int j = 0; j < cellsCount; j++)
             {
@@ -121,7 +128,7 @@ public class ConsoleTableBuilder : IBuilder
                 string formatted = cell.Value.ApplyAlignment(_columnWidths[j], cell.HorizontalAlignment);
                 _stringBuilder.Append(formatted);
 
-                if (j != cellsCount - 1)
+                if (j != lastCellIndex)
                 {
                     _stringBuilder.Append(_theme.VerticalLine);
                 }
@@ -134,14 +141,16 @@ public class ConsoleTableBuilder : IBuilder
     public void BuildFooter()
     {
         _stringBuilder.AppendLine();
-
         _stringBuilder.Append(_theme.BottomLeftCorner);
 
-        for (int i = 0; i < _table.Columns.Count; i++)
+        int columnsCount = _table.Columns.Count;
+        int lastColumnIndex = columnsCount - 1;
+
+        for (int i = 0; i < columnsCount; i++)
         {
             _stringBuilder.Append(_theme.HorizontalLine, _columnWidths[i]);
 
-            if (i != _table.Columns.Count - 1)
+            if (i != lastColumnIndex)
             {
                 _stringBuilder.Append(_theme.BottomTee);
             }
@@ -160,7 +169,15 @@ public class ConsoleTableBuilder : IBuilder
             // - Sum of all column widths
             // - (_table.Columns.Count - 1) vertical separators between columns
             // - 2 characters for the left and right borders of the table
-            int totalWidth = _columnWidths.Sum() + _table.Columns.Count - 1 + 2;
+
+            int totalWidth = 0;
+
+            for (int i = 0; i < _columnWidths.Count; i++)
+            {
+                totalWidth += _columnWidths[i];
+            }
+
+            totalWidth += (columnsCount - 1) + 2;
 
             _stringBuilder.AppendLine(pageInfo.PadLeft(totalWidth));
         }

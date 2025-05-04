@@ -5,8 +5,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<Authors>Mahammad Ahmadov</Authors>
 		<Company>TableTower</Company>
 		<PackageId>TableTower.Core</PackageId>
@@ -22,5 +23,6 @@
 
 	<ItemGroup>
 		<None Update="table.png" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 </Project>

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TableTower.Core\TableTower.Core.csproj" />
+	  <PackageReference Include="TableTower.Core" Version="1.0.0" />
     <ProjectReference Include="..\..\src\TableTower.Data\TableTower.Data.csproj" />
   </ItemGroup>
 

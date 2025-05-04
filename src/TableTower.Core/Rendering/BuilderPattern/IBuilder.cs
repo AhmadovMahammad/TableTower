@@ -1,6 +1,6 @@
 ﻿using TableTower.Core.Models;
 
-namespace TableTower.Core.Renderer.BuilderPattern;
+namespace TableTower.Core.Rendering.BuilderPattern;
 public interface IBuilder
 {
     void SetTable(Table table);

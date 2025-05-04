@@ -51,7 +51,7 @@ internal class Program
         // Option #2 - add data dynamically
 
         var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })
-            .WithData(Enumerable.Repeat(InMemoryDatabase.Users, 100).SelectMany(x => x))
+            .WithData(InMemoryDatabase.Users)
             .WithTheme(theme);
 
         var table = builder.Build();

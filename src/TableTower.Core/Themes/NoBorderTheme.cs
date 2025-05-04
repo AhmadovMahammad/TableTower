@@ -1,5 +1,5 @@
 ﻿namespace TableTower.Core.Themes;
-public  class NoBorderTheme : ITheme
+public class NoBorderTheme : ITheme
 {
     public char TopLeftCorner => ' ';
     public char TopRightCorner => ' ';

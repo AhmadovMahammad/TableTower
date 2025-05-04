@@ -5,7 +5,7 @@ public class DoubleLineTheme : ITheme
     public char TopRightCorner => '╗';
     public char BottomLeftCorner => '╚';
     public char BottomRightCorner => '╝';
-    
+
     public char TopTee => '╦';
     public char BottomTee => '╩';
     public char LeftTee => '╠';

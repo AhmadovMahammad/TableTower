@@ -1,6 +1,6 @@
 ﻿using TableTower.Core.Models;
 
-namespace TableTower.Core.Renderer.BuilderPattern;
+namespace TableTower.Core.Rendering.BuilderPattern;
 public class RenderDirector(IBuilder builder)
 {
     private readonly IBuilder _builder = builder;

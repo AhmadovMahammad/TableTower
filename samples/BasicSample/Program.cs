@@ -48,6 +48,17 @@ internal class Program
         //}
 
 
+        //var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })
+        //    .WithData(InMemoryDatabase.Users)
+        //    .AddFormattedRow(
+        //        (1, HorizontalAlignment.Left, null),
+        //        ("Filankes", HorizontalAlignment.Left, null),
+        //        ("None", HorizontalAlignment.Center, null),
+        //        ("Sumgait", HorizontalAlignment.Right, null),
+        //        ("Long Description", HorizontalAlignment.Right, null)
+        //    )
+        //    .WithTheme(theme);
+
         // Option #2 - add data dynamically
 
         var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })

@@ -1,4 +1,5 @@
 ﻿using TableTower.Core.Models;
+using TableTower.Core.Rendering.BuilderPattern;
 using TableTower.Core.Rendering.BuilderPattern.ConcreteBuilders;
 
 namespace TableTower.Core.Rendering;

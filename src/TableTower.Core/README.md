@@ -15,7 +15,7 @@
 ## Installation
 
 ```csharp
-dotnet add package TableTower
+dotnet add package TableTower.Core --version 1.0.2
 ```
 
 ## Basic Usage

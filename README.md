@@ -154,10 +154,10 @@ consolePager.Run();
 TableTower includes the following themes:
 
 ```
-+-------------+----------+---------+------------+
-| ASCII       | Classic  | Rounded | NoBorder   |
-| Double Line | Minimal  | Box     | Custom     |
-+-------------+----------+---------+------------+
++-------------+----------+----------+
+| ASCII       | Classic  | Rounded  |
+| Double Line | Minimal  | NoBorder |
++-------------+----------+----------+
 ```
 
 Example visuals:

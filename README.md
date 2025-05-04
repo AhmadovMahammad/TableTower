@@ -144,23 +144,26 @@ var consolePager = new ConsolePager<User>(pager, data =>
 consolePager.Run();
 ```
 
-> ![[Pasted image 20250504154023.png]]
-> ![[Pasted image 20250504154034.png]]
+
+> ![image](https://github.com/user-attachments/assets/89f5f1c0-bed1-4ee5-b444-7f6eba2bea84)
+> ![image](https://github.com/user-attachments/assets/49ab4915-70d8-4c9a-884a-330610758fe0)
+
 
 ## Themes
 
 TableTower includes the following themes:
 
 ```
-+-------------+----------+---------+------------+
-| ASCII       | Classic  | Rounded | NoBorder   |
-| Double Line | Minimal  | Box     | Custom     |
-+-------------+----------+---------+------------+
++-------------+----------+----------+
+| ASCII       | Classic  | Rounded  |
+| Double Line | Minimal  | NoBorder |
++-------------+----------+----------+
 ```
 
 Example visuals:
 
-> ![[Pasted image 20250504153757.png]] > ![[Pasted image 20250504153810.png]]
+> ![image](https://github.com/user-attachments/assets/d0092feb-171b-403e-8753-fd4e7d7dfce5)
+> ![image](https://github.com/user-attachments/assets/24cd99b0-0ba2-40c0-99f5-4f700ab3e0ea)
 
 ## Performance Benchmarks
 

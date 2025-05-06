@@ -30,25 +30,52 @@ public sealed class TableBuilder
         }
 
         Type dataType = typeof(T);
-
-        PropertyInfo[] properties;
-        lock (_propertyCache)
-        {
-            if (!_propertyCache.TryGetValue(dataType, out properties!))
-            {
-                properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                _propertyCache[dataType] = properties;
-            }
-        }
-
         var dataList = data as List<T> ?? data.ToList();
 
+        if (IsSimpleType(dataType))
+        {
+            return HandleSimpleType(dataList, usePredefinedColumns);
+        }
+
+        return HandleComplexType(dataList, dataType, usePredefinedColumns);
+    }
+
+    private TableBuilder HandleSimpleType<T>(List<T> dataList, bool usePredefinedColumns)
+    {
         if (!usePredefinedColumns)
         {
             _columns.Clear();
-            foreach (var prop in properties)
+            AddColumn("Value", HorizontalAlignment.Left);
+        }
+
+        if (_columns.Count > 1)
+        {
+            throw new ArgumentException("Primitive data types should only have one column name.");
+        }
+
+        foreach (var item in dataList)
+        {
+            AddRow(item);
+        }
+
+        return this;
+    }
+
+    private TableBuilder HandleComplexType<T>(List<T> dataList, Type dataType, bool usePredefinedColumns)
+    {
+        PropertyInfo[]? properties = null;
+
+        if (!_propertyCache.TryGetValue(dataType, out properties))
+        {
+            properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            _propertyCache.Add(dataType, properties);
+        }
+
+        if (!usePredefinedColumns)
+        {
+            foreach (PropertyInfo property in properties)
             {
-                string columnName = prop.Name;
+                string columnName = property.Name;
                 AddColumn(columnName, HorizontalAlignment.Left);
             }
         }
@@ -141,5 +168,17 @@ public sealed class TableBuilder
     {
         _theme ??= new RoundedTheme();
         return new Table(_columns, _rows, _theme, _tableOptions);
+    }
+
+    // helper
+    private bool IsSimpleType(Type type)
+    {
+        return
+            type.IsPrimitive ||
+            type.IsEnum ||
+            type == typeof(string) ||
+            type == typeof(decimal) ||
+            type == typeof(DateTime) ||
+            type == typeof(Guid);
     }
 }

@@ -3,6 +3,7 @@ using TableTower.Core.Builder;
 using TableTower.Core.Paging;
 using TableTower.Core.Themes;
 using TableTower.Data;
+using TableTower.Data.Models;
 
 namespace PagingSample;
 internal class Program

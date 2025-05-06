@@ -32,6 +32,8 @@ public class ConsoleTableBuilder : IBuilder
             totalWidth += width;
         }
 
+        totalWidth = _columnWidths.Sum() + (_table.Columns.Count - 1) + 2;
+
         if (_charBuffer == null || _bufferSize < totalWidth)
         {
             _charBuffer = ArrayPool<char>.Shared.Rent(totalWidth);

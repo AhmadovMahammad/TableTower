@@ -4,6 +4,7 @@ using TableTower.Core.Builder;
 using TableTower.Core.Rendering;
 using TableTower.Core.Themes;
 using TableTower.Data;
+using TableTower.Data.Models;
 
 namespace TableTower.Benchmarks;
 

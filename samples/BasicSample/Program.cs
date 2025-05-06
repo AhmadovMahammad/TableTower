@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 using TableTower.Core.Builder;
+using TableTower.Core.Enums;
 using TableTower.Core.Rendering;
 using TableTower.Core.Themes;
 using TableTower.Data;
@@ -15,57 +16,92 @@ internal class Program
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         Assembly assembly = Assembly.LoadFrom(Path.Combine(dir, "TableTower.Core.dll"));
 
-        var themes = assembly
+        var themeTypes = assembly
             .GetExportedTypes()
             .Where(t => !t.IsAbstract &&
                         !t.IsInterface &&
                         typeof(ITheme).IsAssignableFrom(t));
 
-        foreach (Type themeType in themes.Reverse())
+        foreach (Type type in themeTypes)
         {
-            object? instance = Activator.CreateInstance(themeType);
+            object? instance = Activator.CreateInstance(type);
             if (instance != null)
             {
-                RunExample($"[ {themeType.Name} ] Team Members", (ITheme)instance, false);
+                ITheme theme = (ITheme)instance;
+
+                ShowPrimitiveDataExample(theme);
+                ShowUserObjectsExample(theme);
+                ShowCustomColumnDefinitionExample(theme);
+                ShowFormattedRowsExample(theme);
             }
         }
     }
-
-    private static void RunExample(string title, ITheme theme, bool wrapData)
+    private static void ShowPrimitiveDataExample(ITheme theme)
     {
-        // Option #1 - add data manually
+        var builder = new TableBuilder(opt => { opt.Title = "Names List"; })
+            .WithColumns("Name")
+            .WithData(InMemoryDatabase.StringData, usePredefinedColumns: true)
+            .WithTheme(theme);
 
-        //var builder = new TableBuilder()
-        //    .WithTitle(title)
-        //    .WithColumns("ID", "Name", "Occupation", "Country")
-        //    .WithColumn("Description", HorizontalAlignment.Right, 40)
-        //    .SetTheme(theme)
-        //    .WrapData(wrapData);
+        var table = builder.Build();
 
-        //foreach (User user in InMemoryDatabase.Users)
-        //{
-        //    builder.AddRow(user.ID, user.Name, user.Occupation, user.Country, user.Description);
-        //}
+        new ConsoleRenderer().Print(table);
 
+        Console.WriteLine("\n\n");
+    }
 
-        //var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })
-        //    .WithData(InMemoryDatabase.Users)
-        //    .AddFormattedRow(
-        //        (1, HorizontalAlignment.Left, null),
-        //        ("Filankes", HorizontalAlignment.Left, null),
-        //        ("None", HorizontalAlignment.Center, null),
-        //        ("Sumgait", HorizontalAlignment.Right, null),
-        //        ("Long Description", HorizontalAlignment.Right, null)
-        //    )
-        //    .WithTheme(theme);
-
-        // Option #2 - add data dynamically
-
-        var builder = new TableBuilder(opt => { opt.Title = title; opt.WrapData = wrapData; })
+    private static void ShowUserObjectsExample(ITheme theme)
+    {
+        var builder = new TableBuilder(opt => { opt.Title = "Users"; })
             .WithData(InMemoryDatabase.Users)
             .WithTheme(theme);
 
         var table = builder.Build();
+
+        new ConsoleRenderer().Print(table);
+
+        Console.WriteLine("\n\n");
+    }
+
+    private static void ShowCustomColumnDefinitionExample(ITheme theme)
+    {
+        var builder = new TableBuilder(opt => { opt.Title = "Choosen Users Details"; })
+            .WithColumn("ID")
+            .WithColumn("Name", HorizontalAlignment.Left)
+            .WithColumn("Country", HorizontalAlignment.Center)
+            .WithColumn("Occupation", HorizontalAlignment.Right, 30)
+            .WithTheme(theme);
+
+        foreach (var user in InMemoryDatabase.Users)
+        {
+            builder.AddRow(user.ID, user.Name, user.Country, user.Occupation);
+        }
+
+        var table = builder.Build();
+
+        new ConsoleRenderer().Print(table);
+
+        Console.WriteLine("\n\n");
+    }
+
+    private static void ShowFormattedRowsExample(ITheme theme)
+    {
+        var builder = new TableBuilder(opt => { opt.Title = "Formatted Users Details"; })
+            .WithColumns("ID", "Name", "Occupation", "Country")
+            .WithTheme(theme);
+
+        foreach (var user in InMemoryDatabase.Users)
+        {
+            builder.AddFormattedRow(
+                (user.ID, HorizontalAlignment.Center, ConsoleColor.Yellow),
+                (user.Name, HorizontalAlignment.Left, ConsoleColor.Green),
+                (user.Occupation, HorizontalAlignment.Center, ConsoleColor.Cyan),
+                (user.Country, HorizontalAlignment.Right, ConsoleColor.Magenta)
+            );
+        }
+
+        var table = builder.Build();
+
         new ConsoleRenderer().Print(table);
 
         Console.WriteLine("\n\n");

@@ -1,4 +1,5 @@
-﻿namespace TableTower.Data;
+﻿namespace TableTower.Data.Models;
+
 public class Product
 {
     public int ID { get; set; }

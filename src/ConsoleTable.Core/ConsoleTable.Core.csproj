@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<Version>1.0.6</Version>
+		<Authors>Mahammad Ahmadov</Authors>
+		<Company>ConsoleTable</Company>
+		<PackageId>ConsoleTable.Core</PackageId>
+		<Description>Simple table rendering library for console apps in .NET</Description>
+		<PackageTags>table console rendering unicode</PackageTags>
+
+		<RepositoryUrl>https://github.com/AhmadovMahammad/TableTower</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/AhmadovMahammad/TableTower</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>table.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="table.png" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="docs\images\" />
+	</ItemGroup>
+</Project>

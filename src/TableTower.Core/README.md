@@ -15,7 +15,7 @@
 ## Installation
 
 ```csharp
-dotnet add package TableTower.Core --version 1.0.7
+dotnet add package TableTower.Core --version 1.0.8
 ```
 
 ## Basic Usage
@@ -144,9 +144,7 @@ var consolePager = new ConsolePager<User>(pager, data =>
 consolePager.Run();
 ```
 
-### Example visuals:
-
-> ![pagination_1](https://raw.githubusercontent.com/AhmadovMahammad/TableTower/main/docs/images/pagination_1.png) > ![pagination_2](https://raw.githubusercontent.com/AhmadovMahammad/TableTower/main/docs/images/pagination_2.png)
+### Example visuals in GitHub
 
 ## Themes
 
@@ -159,9 +157,7 @@ TableTower includes the following themes:
 +-------------+----------+----------+
 ```
 
-Example visuals:
-
-> ![theme_1](https://raw.githubusercontent.com/AhmadovMahammad/TableTower/main/docs/images/theme_1.png) > ![theme_2](https://raw.githubusercontent.com/AhmadovMahammad/TableTower/main/docs/images/theme_2.png)
+### Example visuals in GitHub
 
 ## Performance Benchmarks
 

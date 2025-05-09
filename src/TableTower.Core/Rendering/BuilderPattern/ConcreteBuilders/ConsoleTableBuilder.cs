@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TableTower.Core.Extensions;
@@ -220,16 +221,21 @@ public class ConsoleTableBuilder : IBuilder
 
         _stringBuilder.Append(_theme.BottomRightCorner);
 
+        // The length of the page information may exceed the width of the columns plus the left and right borders (total 2 chars).
+        // Thus, always rent a counter buffer as maximum number of them
         if (_table.EnableDataCount)
         {
             _stringBuilder.AppendLine();
 
             var totalRows = _table.Rows.Count;
             var pageInfo = $"Total: {totalRows} row{(totalRows == 1 ? "" : "s")}";
+
             int totalWidth = _columnWidths.Sum() + (columnsCount - 1) + 2;
+            totalWidth = Math.Max(totalWidth, pageInfo.Length);
 
             Span<char> counterBuffer = _charBuffer.AsSpan(0, totalWidth);
             counterBuffer.Fill(' ');
+
 
             ReadOnlySpan<char> pageInfoSpan = pageInfo.AsSpan();
             pageInfoSpan.CopyTo(counterBuffer[(totalWidth - pageInfoSpan.Length)..]);

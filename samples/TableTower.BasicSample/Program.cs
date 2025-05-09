@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using TableTower.Core.Builder;
 using TableTower.Core.Enums;
@@ -22,7 +24,8 @@ internal class Program
                         !t.IsInterface &&
                         typeof(ITheme).IsAssignableFrom(t));
 
-        foreach (Type type in themeTypes)
+        //foreach (Type type in themeTypes)
+        foreach (Type type in themeTypes.Where(t => t.IsAssignableFrom(typeof(RoundedTheme))))
         {
             object? instance = Activator.CreateInstance(type);
             if (instance != null)
@@ -30,24 +33,49 @@ internal class Program
                 ITheme theme = (ITheme)instance;
 
                 ShowPrimitiveDataExample(theme);
-                ShowUserObjectsExample(theme);
-                ShowCustomColumnDefinitionExample(theme);
-                ShowFormattedRowsExample(theme);
+
+                //ShowUserObjectsExample(theme);
+
+                //ShowCustomColumnDefinitionExample(theme);
+
+                //ShowFormattedRowsExample(theme);
             }
         }
     }
+
     private static void ShowPrimitiveDataExample(ITheme theme)
     {
-        var builder = new TableBuilder(opt => { opt.Title = "Names List"; })
-            .WithColumns("Name")
-            .WithData(InMemoryDatabase.StringData, usePredefinedColumns: true)
-            .WithTheme(theme);
+        var method = typeof(TableBuilder)
+            .GetMethods()
+            .First(m => m.Name == "WithData" && m.IsGenericMethod && m.GetParameters().Length >= 1);
 
-        var table = builder.Build();
+        var listData = new List<IEnumerable>
+        {
+            InMemoryDatabase.StringData,
+            InMemoryDatabase.DateData,
+            InMemoryDatabase.PriceData,
+            InMemoryDatabase.BooleanData,
+            InMemoryDatabase.IntegerData,
+        };
 
-        new ConsoleRenderer().Print(table);
+        foreach (var data in listData)
+        {
+            Type itemType = data.GetType().GetGenericArguments()[0];
 
-        Console.WriteLine("\n\n");
+            var builder = new TableBuilder(opt =>
+            {
+                opt.ShowRowLines = true;
+                opt.Title = "Primitive Data Type";
+            }).WithTheme(theme);
+
+            MethodInfo genericMethod = method.MakeGenericMethod(itemType);
+            genericMethod.Invoke(builder, [data, false]);
+
+            var table = builder.Build();
+            new ConsoleRenderer().Print(table);
+
+            Console.WriteLine("\n\n");
+        }
     }
 
     private static void ShowUserObjectsExample(ITheme theme)

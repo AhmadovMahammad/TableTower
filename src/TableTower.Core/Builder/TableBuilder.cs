@@ -45,7 +45,7 @@ public sealed class TableBuilder
         if (!usePredefinedColumns)
         {
             _columns.Clear();
-            AddColumn("Value", HorizontalAlignment.Left);
+            AddColumn("Value", HorizontalAlignment.Center);
         }
 
         if (_columns.Count > 1)
@@ -55,7 +55,9 @@ public sealed class TableBuilder
 
         foreach (var item in dataList)
         {
-            AddRow(item);
+            var formattedRow = ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(item, HorizontalAlignment.Left, ConsoleColor.White);
+
+            AddFormattedRow(formattedRow);
         }
 
         return this;
@@ -63,9 +65,7 @@ public sealed class TableBuilder
 
     private TableBuilder HandleComplexType<T>(List<T> dataList, Type dataType, bool usePredefinedColumns)
     {
-        PropertyInfo[]? properties = null;
-
-        if (!_propertyCache.TryGetValue(dataType, out properties))
+        if (!_propertyCache.TryGetValue(dataType, out PropertyInfo[]? properties))
         {
             properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             _propertyCache.Add(dataType, properties);

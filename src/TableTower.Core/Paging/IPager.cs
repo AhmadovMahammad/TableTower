@@ -1,4 +1,6 @@
-﻿namespace TableTower.Core.Paging;
+﻿using System.Collections.Generic;
+
+namespace TableTower.Core.Paging;
 public interface IPager<T> where T : class
 {
     int TotalItems { get; } // total 100 rows

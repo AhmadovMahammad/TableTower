@@ -7,7 +7,7 @@ public class User
     public string Occupation { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Address HomeAddress { get; set; } = new Address();
-    public List<Product> PurchasedProducts { get; set; } = new List<Product>();
-    public Company Employer { get; set; } = new Company();
+    public Address? HomeAddress { get; set; } = new Address();
+    public List<Product>? PurchasedProducts { get; set; } = [];
+    public Company? Employer { get; set; } = new Company();
 }

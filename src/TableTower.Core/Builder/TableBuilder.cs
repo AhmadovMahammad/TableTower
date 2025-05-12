@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
+using System.Runtime.InteropServices.Marshalling;
 using TableTower.Core.Enums;
 using TableTower.Core.Models;
 using TableTower.Core.Themes;
@@ -6,15 +8,16 @@ using TableTower.Core.Themes;
 namespace TableTower.Core.Builder;
 public sealed class TableBuilder
 {
+    private static readonly Dictionary<Type, PropertyInfo[]> _propertyCache = new Dictionary<Type, PropertyInfo[]>(10);
+    private readonly Dictionary<string, Type> _referenceTypes = [];
+    private readonly TableOptions _tableOptions;
+
     private readonly List<Column> _columns = new(20);
     private readonly List<Row> _rows = new(100);
 
     private int _rowIndex;
     private int _columnCount;
     private ITheme? _theme;
-    private readonly TableOptions _tableOptions;
-
-    private static readonly Dictionary<Type, PropertyInfo[]> _propertyCache = new Dictionary<Type, PropertyInfo[]>(10);
 
     public TableBuilder(Action<TableOptions>? configure = null)
     {
@@ -22,22 +25,27 @@ public sealed class TableBuilder
         configure?.Invoke(_tableOptions);
     }
 
-    public TableBuilder WithData<T>(IEnumerable<T> data, bool usePredefinedColumns = false)
+    public TableBuilder WithData<T>(T data, bool usePredefinedColumns = false)
+    {
+        return WithDataCollection([data], usePredefinedColumns);
+    }
+
+    public TableBuilder WithDataCollection<T>(IEnumerable<T> data, bool usePredefinedColumns = false)
     {
         if (data == null)
         {
             return this;
         }
 
-        Type dataType = typeof(T);
-        var dataList = data as List<T> ?? data.ToList();
+        List<T> dataList = data as List<T> ?? [.. data];
+        Type typeFromHandle = typeof(T);
 
-        if (IsSimpleType(dataType))
+        if (IsSimpleType(typeFromHandle))
         {
             return HandleSimpleType(dataList, usePredefinedColumns);
         }
 
-        return HandleComplexType(dataList, dataType, usePredefinedColumns);
+        return HandleComplexType(dataList, typeFromHandle, usePredefinedColumns);
     }
 
     private TableBuilder HandleSimpleType<T>(List<T> dataList, bool usePredefinedColumns)
@@ -53,11 +61,10 @@ public sealed class TableBuilder
             throw new ArgumentException("Primitive data types should only have one column name.");
         }
 
-        foreach (var item in dataList)
+        foreach (T data in dataList)
         {
-            var formattedRow = ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(item, HorizontalAlignment.Left, ConsoleColor.White);
-
-            AddFormattedRow(formattedRow);
+            var tuple = ValueTuple.Create((object?)data, (HorizontalAlignment?)HorizontalAlignment.Left, (ConsoleColor?)ConsoleColor.White);
+            AddFormattedRow(tuple);
         }
 
         return this;
@@ -65,31 +72,93 @@ public sealed class TableBuilder
 
     private TableBuilder HandleComplexType<T>(List<T> dataList, Type dataType, bool usePredefinedColumns)
     {
-        if (!_propertyCache.TryGetValue(dataType, out PropertyInfo[]? properties))
+        if (!_propertyCache.TryGetValue(dataType, out PropertyInfo[]? propertiesInfo) && propertiesInfo == null)
         {
-            properties = dataType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            _propertyCache.Add(dataType, properties);
+            propertiesInfo = dataType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            _propertyCache.Add(dataType, propertiesInfo);
         }
 
         if (!usePredefinedColumns)
         {
-            foreach (PropertyInfo property in properties)
+            PropertyInfo[] array = propertiesInfo;
+
+            for (int i = 0; i < array.Length; i++)
             {
-                string columnName = property.Name;
-                AddColumn(columnName, HorizontalAlignment.Left);
+                PropertyInfo propInfo = array[i];
+                string name = propInfo.Name;
+                Type propType = propInfo.PropertyType;
+
+                // Check if property is a complex type (potential reference and not a collection)
+                if (!IsSimpleType(propType) && !propType.IsArray && !typeof(IEnumerable).IsAssignableFrom(propType))
+                {
+                    _referenceTypes[name] = propType;
+                    name = $"{name} (Ref)";
+                }
+                else if (typeof(IEnumerable).IsAssignableFrom(propType) && propType != typeof(string))
+                {
+                    Type? elementType = propType.IsArray
+                        ? propType.GetElementType()
+                        : propType.IsGenericType
+                            ? propType.GetGenericArguments().FirstOrDefault()
+                            : null;
+
+                    if (elementType != null && !IsSimpleType(elementType))
+                    {
+                        _referenceTypes[name] = elementType;
+                        name = $"{name} (List Ref)";
+                    }
+                }
+
+                AddColumn(name);
             }
-        }
 
-        object?[] values = new object?[properties.Length];
-
-        foreach (T item in dataList)
-        {
-            for (int i = 0; i < properties.Length; i++)
+            object?[] array2 = new object[propertiesInfo.Length];
+            foreach (T data in dataList)
             {
-                values[i] = properties[i].GetValue(item);
-            }
+                if (data == null)
+                {
+                    continue;
+                }
 
-            AddRow(values);
+                for (int j = 0; j < propertiesInfo.Length; j++)
+                {
+                    PropertyInfo propertyInfo = propertiesInfo[j];
+                    object? propertyValue = propertyInfo.GetValue(data);
+
+                    if (propertyValue == null)
+                    {
+                        array2[j] = "[null]";
+                        continue;
+                    }
+
+                    if (_referenceTypes.TryGetValue(propertyInfo.Name, out Type? refType) && refType != null)
+                    {
+                        // Individual reference
+                        if (!propertyInfo.PropertyType.IsArray && !typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType))
+                        {
+                            array2[j] = $"[{propertyInfo.Name}]";
+                        }
+                        else if (propertyValue is IEnumerable collection) // Collection reference
+                        {
+                            int count = 0;
+
+                            IEnumerator enumerator = collection.GetEnumerator();
+                            while (enumerator.MoveNext())
+                            {
+                                count++;
+                            }
+
+                            array2[j] = $"[{count} item(s)]";
+                        }
+                    }
+                    else
+                    {
+                        array2[j] = propertyValue ?? "[null]";
+                    }
+                }
+
+                AddRow(array2);
+            }
         }
 
         return this;
@@ -124,14 +193,13 @@ public sealed class TableBuilder
 
     public TableBuilder AddRow(params object?[] values)
     {
-        var cellFormats = new ValueTuple<object?, HorizontalAlignment?, ConsoleColor?>[values.Length];
-
+        (object?, HorizontalAlignment?, ConsoleColor?)[] array = new (object?, HorizontalAlignment?, ConsoleColor?)[values.Length];
         for (int i = 0; i < values.Length; i++)
         {
-            cellFormats[i] = ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(values[i], null, ConsoleColor.White);
+            array[i] = ValueTuple.Create<object?, HorizontalAlignment?, ConsoleColor?>(values[i], null, ConsoleColor.White);
         }
 
-        return AddFormattedRow(cellFormats);
+        return AddFormattedRow(array);
     }
 
     public TableBuilder AddFormattedRow(params (object? Value, HorizontalAlignment? HorizontalAlignment, ConsoleColor? Color)[] cellFormats)
@@ -146,6 +214,7 @@ public sealed class TableBuilder
         for (int i = 0; i < _columnCount; i++)
         {
             Column currentColumn = _columns[i];
+
             var cellFormat = cellFormats[i];
             cellFormat.HorizontalAlignment ??= currentColumn.HorizontalAlignment;
 

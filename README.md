@@ -7,7 +7,7 @@
 - Multiple built-in themes: ASCII, Minimal, Classic, Double Line, Rounded, NoBorder
 - Fluent API using builder pattern
 - Pagination support for large datasets
-- Automatic data binding from any collection of objects
+- Automatic data binding from both any collection of objects and non list data
 - Column customization: alignment, width, and more
 - Text wrapping support
 - High performance and low memory usage
@@ -15,43 +15,44 @@
 ## Installation
 
 ```csharp
-dotnet add package TableTower.Core --version 1.0.8
+dotnet add package TableTower.Core --version 1.0.9
 ```
 
 ## Basic Usage
 
-### Automatic Data Binding
+### 1. Automatic Data Binding
 
 ```csharp
 using TableTower.Core.Builder;
 using TableTower.Core.Rendering;
 using TableTower.Core.Themes;
 
-var builder = new TableBuilder(opt =>
+TableBuilder builder = new TableBuilder(opt =>
 {
-    opt.Title = "Team Members";
+    opt.Title = "Users";
+    opt.ShowRowLines = true;
     opt.WrapData = false;
+    opt.EnableDataCount = true;
 })
-.WithData(users)
+.WithDataCollection(InMemoryDatabase.Users) // .WithData(InMemoryDatabase.NonListData)
 .WithTheme(new RoundedTheme());
 
 var table = builder.Build();
 new ConsoleRenderer().Print(table);
 ```
 
-### Manual Columns with Custom Settings
+### 2. Manual Columns with Custom Settings
 
 ```csharp
-var builder = new TableBuilder()
-    .WithTitle("Team Members")
-    .WithColumns("ID", "Name", "Occupation", "Country")
-    .WithColumn("Description", HorizontalAlignment.Right, 40)
-    .WithTheme(new BoxTheme())
-    .WrapData(true);
+var builder = new TableBuilder(opt => { opt.Title = "Choosen Users Details"; })
+    .WithColumns("ID", "Name")
+    .WithColumn("Country", HorizontalAlignment.Center)
+    .WithColumn("Occupation", HorizontalAlignment.Right, 30)
+    .WithTheme(theme);
 
-foreach (User user in users)
+foreach (var user in InMemoryDatabase.Users)
 {
-    builder.AddRow(user.ID, user.Name, user.Occupation, user.Country, user.Description);
+    builder.AddRow(user.ID, user.Name, user.Country, user.Occupation);
 }
 
 var table = builder.Build();
@@ -66,7 +67,7 @@ You can configure core rendering and behavior via `TableOptions`.
 var builder = new TableBuilder(opt =>
 {
     opt.Title = "My Table";
-    opt.WrapData = true;
+    opt.WrapData = false;
     opt.ShowRowLines = true;
     opt.EnableDataCount = true;
 });
@@ -96,10 +97,10 @@ builder.WithColumn("Description", HorizontalAlignment.Right, 40);
 builder.AddRow(1, "Mahammad Ahmadov", "Developer", "Some long description here...");
 
 // Automatic binding
-builder.WithData(users);
+builder.WithDataCollection(users);
 
 // Binding with predefined columns
-builder.WithData(users, usePredefinedColumns: true);
+builder.WithDataCollection(users, usePredefinedColumns: true); // .WithData(InMemoryDatabase.NonListData)
 ```
 
 ## Formatted Rows and Custom Cell Configuration
@@ -107,20 +108,19 @@ builder.WithData(users, usePredefinedColumns: true);
 You can control each cell’s alignment and optional color using `AddFormattedRow`.
 
 ```csharp
-var builder = new TableBuilder(opt =>
+var builder = new TableBuilder(opt => { opt.Title = "Formatted Users Details"; })
+    .WithColumns("ID", "Name", "Occupation", "Country")
+    .WithTheme(theme);
+
+foreach (var user in InMemoryDatabase.Users)
 {
-    opt.Title = "Custom Formatted Row";
-    opt.WrapData = true;
-})
-.WithData(InMemoryDatabase.Users)
-.AddFormattedRow(
-    (1, HorizontalAlignment.Left, null),
-    ("Filankes", HorizontalAlignment.Left, null),
-    ("None", HorizontalAlignment.Center, null),
-    ("Sumgait", HorizontalAlignment.Right, null),
-    ("Long Description", HorizontalAlignment.Right, null)
-)
-.WithTheme(new RoundedTheme());
+    builder.AddFormattedRow(
+        (user.ID, HorizontalAlignment.Center, ConsoleColor.Yellow),
+        (user.Name, HorizontalAlignment.Left, ConsoleColor.Green),
+        (user.Occupation, HorizontalAlignment.Center, ConsoleColor.Cyan),
+        (user.Country, HorizontalAlignment.Right, ConsoleColor.Magenta)
+    );
+}
 
 var table = builder.Build();
 new ConsoleRenderer().Print(table);
@@ -136,7 +136,7 @@ IPager<User> pager = new DefaultPager<User>(users, pageSize: 10);
 var consolePager = new ConsolePager<User>(pager, data =>
 {
     return new TableBuilder()
-        .WithData(data)
+        .WithDataCollection(data) // .WithData(InMemoryDatabase.NonListData)
         .WithTheme(new RoundedTheme())
         .Build();
 });
@@ -197,15 +197,15 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        Console.OutputEncoding = Encoding.UTF8;
-
-        var builder = new TableBuilder(opt =>
+        TableBuilder builder = new TableBuilder(opt =>
         {
-            opt.Title = "Team Members";
+            opt.Title = "Users";
+            opt.ShowRowLines = false;
             opt.WrapData = false;
+            opt.EnableDataCount = true;
         })
-        .WithData(InMemoryDatabase.Users)
-        .WithTheme(new RoundedTheme());
+        .WithDataCollection(InMemoryDatabase.Users) // .WithData(InMemoryDatabase.NonListData)
+        .WithTheme(theme);
 
         var table = builder.Build();
         new ConsoleRenderer().Print(table);

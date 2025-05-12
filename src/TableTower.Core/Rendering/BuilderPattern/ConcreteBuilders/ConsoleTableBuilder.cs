@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TableTower.Core.Extensions;
@@ -145,6 +144,7 @@ public class ConsoleTableBuilder : IBuilder
             for (int j = 0; j < cellsCount; j++)
             {
                 Cell cell = currentRow.Cells[j];
+
                 Span<char> cellBuffer = _charBuffer.AsSpan(0, _columnWidths[j]);
                 cell.Value.AsSpan().ApplyAlignment(cellBuffer, _columnWidths[j], cell.HorizontalAlignment);
                 _stringBuilder.Append(cellBuffer);

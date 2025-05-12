@@ -17,7 +17,7 @@ internal class Program
         var consolePager = new ConsolePager<User>(pager, (data) =>
         {
             var builder = new TableBuilder(opt => { opt.Title = "Users Page"; opt.WrapData = false; })
-                .WithData(data)
+                .WithDataCollection(data)
                 .WithTheme(new RoundedTheme());
 
             return builder.Build();

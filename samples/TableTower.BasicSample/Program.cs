@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using TableTower.Core.Builder;
 using TableTower.Core.Enums;
 using TableTower.Core.Rendering;
@@ -13,8 +11,6 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        Console.OutputEncoding = Encoding.UTF8;
-
         string dir = AppDomain.CurrentDomain.BaseDirectory;
         Assembly assembly = Assembly.LoadFrom(Path.Combine(dir, "TableTower.Core.dll"));
 
@@ -24,7 +20,6 @@ internal class Program
                         !t.IsInterface &&
                         typeof(ITheme).IsAssignableFrom(t));
 
-        //foreach (Type type in themeTypes)
         foreach (Type type in themeTypes.Where(t => t.IsAssignableFrom(typeof(RoundedTheme))))
         {
             object? instance = Activator.CreateInstance(type);
@@ -32,13 +27,11 @@ internal class Program
             {
                 ITheme theme = (ITheme)instance;
 
-                ShowPrimitiveDataExample(theme);
-
-                //ShowUserObjectsExample(theme);
-
-                //ShowCustomColumnDefinitionExample(theme);
-
-                //ShowFormattedRowsExample(theme);
+                //ShowPrimitiveDataExample(theme);
+                ShowUserObjectsExample(theme);
+                ShowCustomColumnDefinitionExample(theme);
+                ShowFormattedRowsExample(theme);
+                ShowNonListData(theme);
             }
         }
     }
@@ -47,7 +40,7 @@ internal class Program
     {
         var method = typeof(TableBuilder)
             .GetMethods()
-            .First(m => m.Name == "WithData" && m.IsGenericMethod && m.GetParameters().Length >= 1);
+            .First(m => m.Name == "WithDataCollection" && m.IsGenericMethod && m.GetParameters().Length >= 1);
 
         var listData = new List<IEnumerable>
         {
@@ -71,31 +64,29 @@ internal class Program
             MethodInfo genericMethod = method.MakeGenericMethod(itemType);
             genericMethod.Invoke(builder, [data, false]);
 
-            var table = builder.Build();
-            new ConsoleRenderer().Print(table);
-
-            Console.WriteLine("\n\n");
+            Print(builder);
         }
     }
 
     private static void ShowUserObjectsExample(ITheme theme)
     {
-        var builder = new TableBuilder(opt => { opt.Title = "Users"; })
-            .WithData(InMemoryDatabase.Users)
-            .WithTheme(theme);
+        TableBuilder builder = new TableBuilder(opt =>
+        {
+            opt.Title = "Users";
+            opt.ShowRowLines = false;
+            opt.WrapData = false;
+            opt.EnableDataCount = true;
+        })
+        .WithDataCollection(InMemoryDatabase.Users)
+        .WithTheme(theme);
 
-        var table = builder.Build();
-
-        new ConsoleRenderer().Print(table);
-
-        Console.WriteLine("\n\n");
+        Print(builder);
     }
 
     private static void ShowCustomColumnDefinitionExample(ITheme theme)
     {
         var builder = new TableBuilder(opt => { opt.Title = "Choosen Users Details"; })
-            .WithColumn("ID")
-            .WithColumn("Name", HorizontalAlignment.Left)
+            .WithColumns("ID", "Name")
             .WithColumn("Country", HorizontalAlignment.Center)
             .WithColumn("Occupation", HorizontalAlignment.Right, 30)
             .WithTheme(theme);
@@ -105,11 +96,7 @@ internal class Program
             builder.AddRow(user.ID, user.Name, user.Country, user.Occupation);
         }
 
-        var table = builder.Build();
-
-        new ConsoleRenderer().Print(table);
-
-        Console.WriteLine("\n\n");
+        Print(builder);
     }
 
     private static void ShowFormattedRowsExample(ITheme theme)
@@ -128,6 +115,26 @@ internal class Program
             );
         }
 
+        Print(builder);
+    }
+
+    private static void ShowNonListData(ITheme theme)
+    {
+        TableBuilder builder = new TableBuilder(opt =>
+        {
+            opt.Title = "Users";
+            opt.ShowRowLines = false;
+            opt.WrapData = false;
+            opt.EnableDataCount = true;
+        })
+        .WithData(InMemoryDatabase.NonListData)
+        .WithTheme(theme);
+
+        Print(builder);
+    }
+
+    private static void Print(TableBuilder builder)
+    {
         var table = builder.Build();
 
         new ConsoleRenderer().Print(table);

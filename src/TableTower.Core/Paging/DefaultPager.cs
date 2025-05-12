@@ -1,4 +1,8 @@
-﻿namespace TableTower.Core.Paging;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TableTower.Core.Paging;
 public sealed class DefaultPager<T> : IPager<T> where T : class, new()
 {
     private readonly IEnumerable<T> _items;

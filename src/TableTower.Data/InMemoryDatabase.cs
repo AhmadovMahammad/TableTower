@@ -3,9 +3,20 @@
 namespace TableTower.Data;
 public static class InMemoryDatabase
 {
-    // Primitive Types
-    public static List<int> IntegerData { get; } = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // Simple Class Declaration
+    public static User NonListData = new()
+    {
+        ID = 1,
+        Name = "Mahammad Ahmadov",
+        Occupation = "Software Developer",
+        Country = "Azerbaijan",
+        Description = "Builds clean backend systems.",
+        HomeAddress = null,
+        PurchasedProducts = null,
+        Employer = null
+    };
 
+    // Primitive Types
     public static List<string> StringData { get; } =
     [
         "Mahammad Ahmadov",
@@ -20,10 +31,9 @@ public static class InMemoryDatabase
         "Ilkin Murselov"
     ];
 
+    public static List<int> IntegerData { get; } = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     public static List<double> PriceData { get; } = [19.99, 29.99, 39.99, 49.99, 59.99];
-
     public static List<bool> BooleanData { get; } = [true, false, true, true, false];
-
     public static List<DateTime> DateData { get; } =
     [
         new DateTime(2023, 1, 15),
@@ -63,7 +73,8 @@ public static class InMemoryDatabase
 
     public static List<Company> Companies { get; } =
     [
-        new() {
+        new()
+        {
             ID = 1,
             Name = "TechSolutions Azerbaijan",
             Headquarters = Addresses[0],
@@ -71,7 +82,8 @@ public static class InMemoryDatabase
             AnnualRevenue = 5000000.00m,
             Departments = [Departments[0], Departments[1], Departments[2]]
         },
-        new() {
+        new()
+        {
             ID = 2,
             Name = "DataCore Systems",
             Headquarters = Addresses[1],
@@ -79,7 +91,8 @@ public static class InMemoryDatabase
             AnnualRevenue = 3200000.00m,
             Departments = [Departments[0], Departments[3]]
         },
-        new() {
+        new()
+        {
             ID = 3,
             Name = "InnoTech Azerbaijan",
             Headquarters = Addresses[2],
@@ -91,7 +104,8 @@ public static class InMemoryDatabase
 
     public static List<User> Users { get; } =
     [
-         new() {
+         new()
+         {
              ID = 1,
              Name = "Mahammad Ahmadov",
              Occupation = "Software Developer",
@@ -101,7 +115,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[0], Products[2]],
              Employer = Companies[0]
          },
-         new() {
+         new()
+         {
              ID = 2,
              Name = "Lale Hasanli",
              Occupation = "UX Designer",
@@ -111,7 +126,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[1]],
              Employer = Companies[0]
          },
-         new() {
+         new()
+         {
              ID = 3,
              Name = "Rashad Mammadov",
              Occupation = "Product Manager",
@@ -121,7 +137,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[0], Products[1], Products[4]],
              Employer = Companies[1]
          },
-         new() {
+         new()
+         {
              ID = 4,
              Name = "Aygun Aliyeva",
              Occupation = "Data Scientist",
@@ -131,7 +148,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[2], Products[3]],
              Employer = Companies[1]
          },
-         new() {
+         new()
+         {
              ID = 5,
              Name = "Togrul Huseynov",
              Occupation = "DevOps Engineer",
@@ -141,7 +159,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[0]],
              Employer = Companies[2]
          },
-         new() {
+         new()
+         {
              ID = 6,
              Name = "Narmin Karimova",
              Occupation = "AI Researcher",
@@ -151,7 +170,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[2], Products[4]],
              Employer = Companies[2]
          },
-         new() {
+         new()
+         {
              ID = 7,
              Name = "Kamran Safarov",
              Occupation = "Security Analyst",
@@ -161,7 +181,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[3]],
              Employer = Companies[0]
          },
-         new() {
+         new()
+         {
              ID = 8,
              Name = "Sevinc Ismayilova",
              Occupation = "Frontend Engineer",
@@ -171,7 +192,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[0], Products[1]],
              Employer = Companies[1]
          },
-         new() {
+         new()
+         {
              ID = 9,
              Name = "Sahnise Shirinli",
              Occupation = "Sales Specialist",
@@ -181,7 +203,8 @@ public static class InMemoryDatabase
              PurchasedProducts = [Products[4]],
              Employer = Companies[2]
          },
-         new() {
+         new()
+         {
              ID = 10,
              Name = "Ilkin Murselov",
              Occupation = "QA Engineer",
@@ -206,7 +229,7 @@ public static class InMemoryDatabase
         ["TopProducts"] = Products.OrderByDescending(p => p.Price).Take(3).ToList(),
         ["UsersByCompany"] = Companies.ToDictionary(
             c => c.Name,
-            c => Users.Where(u => u.Employer.ID == c.ID).ToList()
+            c => Users.Where(u => u.Employer?.ID == c.ID).ToList()
         )
     };
 
